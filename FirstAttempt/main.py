@@ -10,7 +10,7 @@ def perceptron() :
     n = int(input("How many times will I go through the data ?\n"))
     #Our traning data.
     data = [[[1, 0, 0], -1], [[1, 0, 1], 1], [[1, 1 ,0], 1], [[1, 1, 1], 1]]
-    #the weights were predetermined in the exercecise.
+    #the weights were predetermined by the teacher.
     weights = np.array([0.5, -1, 1])
 
     for j in range(n) :
