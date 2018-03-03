@@ -1,10 +1,11 @@
 import numpy as np
 
 class learning() :
-    def __init__(self, input, expected = None) :
-        self.W = np.array([0 for i in input[0]])
+    def __init__(self, input, expected = None, weights = None) :
         self.input = input
-        if expected != None:
+        if weights is None:
+            self.W = np.array([0 for i in input[0]])
+        if expected is not None:
             self.expected = expected
 
     def PLA(self, n) :
@@ -14,10 +15,14 @@ class learning() :
                 if result != self.expected[j] :
                     self.W += np.array(self.input[j])*self.expected[j]
 
+    def linear_regression(self) :
+        self.W = np.dot(np.linalg.pinv(self.input), self.expected)
+
 input = [[1, 0, 0], [1, 0, 1], [1, 1 ,0], [1, 1, 1]]
 output = [-1, 1, 1, 1]
 
-bob = learning(np.array(input), np.array(output))
-
-bob.PLA(5)
-bob.p_weithgs()
+example = learning(np.array(input), np.array(output))
+example.PLA(5)
+print(example.W)
+example.linear_regression()
+print(example.W)
