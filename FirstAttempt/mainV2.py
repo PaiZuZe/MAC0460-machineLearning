@@ -3,9 +3,9 @@ import numpy as np
 class learning() :
     def __init__(self, input, expected = None, weights = None) :
         self.input = input
-        if weights is None:
+        if weights is None :
             self.W = np.array([0 for i in input[0]])
-        if expected is not None:
+        if expected is not None :
             self.expected = expected
 
     def PLA(self, n) :
@@ -15,6 +15,14 @@ class learning() :
                 if result != self.expected[j] :
                     self.W += np.array(self.input[j])*self.expected[j]
 
+    def pocket(self, n) :
+        best_w, best_err = self.W, 1
+        for i in range(n) :
+            self.PLA(1)
+            new_err = self.err_insample()
+            if new_err < best_err :
+                best_w = self.W
+
     def linear_regression(self) :
         self.W = np.dot(np.linalg.pinv(self.input), self.expected)
 
@@ -22,7 +30,7 @@ class learning() :
         count = 0
         for i in range(len(input)) :
             result = np.sign(np.dot(self.W, self.input[i]))
-            if result == self.expected[i] :
+            if result != self.expected[i] :
                 count += 1
         return count/len(input)
 
