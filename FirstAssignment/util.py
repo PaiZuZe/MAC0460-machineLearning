@@ -69,7 +69,7 @@ def plot_points_regression(x,
     fig, ax = plt.subplots(1, 1, figsize=(8, 8))
     line1, = ax.plot(x, y, 'bo', label='Real data')
     if prediction is not None:
-        line2, = ax.plot(x, prediction[1]*x + prediction[0], 'r', label='Predicted data')
+        line2, = ax.plot(x, prediction, 'r', label='Predicted data')
         if legend:
             plt.legend(handles=[line1, line2], loc=2)
     ax.set_title(title,
