@@ -18,7 +18,10 @@ class LogisticRegression(nn.Module):
     def __init__(self, config):
         super(LogisticRegression, self).__init__()
         # YOUR CODE HERE:
-        raise NotImplementedError("falta completar o método __init__ da classe LogisticRegression")
+        self.input_size = config.height * config.width * config.channels
+        self.output_size = config.classes
+        self.lin = nn.Linear(self.input_size, self.output_size)
+        self.soft = nn.Softmax(dim=1)
         # END YOUR CODE
 
     def forward(self, x):
@@ -31,7 +34,7 @@ class LogisticRegression(nn.Module):
         :rtype: torch.FloatTensor(shape=[batch_size, number_of_classes])
         """
         # YOUR CODE HERE:
-        raise NotImplementedError("falta completar o método forward da classe LogisticRegression")
+        logits = self.lin(x)
         # END YOUR CODE
         return logits
 
@@ -45,7 +48,7 @@ class LogisticRegression(nn.Module):
         :rtype: torch.LongTensor(shape=[batch_size, number_of_classes])
         """
         # YOUR CODE HERE:
-        raise NotImplementedError("falta completar o método predict da classe LogisticRegression")          
+        predictions = torch.argmax(self.soft(self.forward(x)), dim=1)
         # END YOUR CODE
         return predictions
 
@@ -63,7 +66,11 @@ class DFN(nn.Module):
     def __init__(self, config):
         super(DFN, self).__init__()
         # YOUR CODE HERE:
-        raise NotImplementedError("falta completar o método __init__ da classe DFN")
+        self.relu = nn.ReLU()
+        self.soft = nn.Softmax(dim=1)
+        self.add_module("module0", nn.Linear(config.height * config.width * config.channels, config.architecture[0]))
+        for i in range(len(config.architecture) - 1):
+            self.add_module("module" + str(i + 1), nn.Linear(config.architecture[i], config.architecture[i + 1]))
         # END YOUR CODE
 
 
@@ -77,7 +84,10 @@ class DFN(nn.Module):
         :rtype: torch.FloatTensor(shape=[batch_size, number_of_classes])
         """
         # YOUR CODE HERE:
-        raise NotImplementedError("falta completar o método forward da classe DFN")
+        h = x.clone()
+        for func in self.children() :
+            h = self.relu(func(h))
+        logits = h
         # END YOUR CODE
         return logits
 
@@ -91,7 +101,7 @@ class DFN(nn.Module):
         :rtype: torch.LongTensor(shape=[batch_size, number_of_classes])
         """
         # YOUR CODE HERE:
-        raise NotImplementedError("falta completar o método predict da classe DFN")     
+        predictions = torch.argmax(self.soft(self.forward(x)), dim=1)
         # END YOUR CODE
         return predictions
 
@@ -120,11 +130,11 @@ def train_model_img_classification(model,
 
     best_valid_loss = float("inf")
     # YOUR CODE HERE:
-    # i) define the loss criteria and the optimizer. 
+    # i) define the loss criteria and the optimizer.
     # You may find nn.CrossEntropyLoss and torch.optim.SGD useful here.
-    raise NotImplementedError("falta completar a função train_model_img_classification")
-    # criterion =  
-    # optimizer =
+    batch_vx, batch_vy = next(iter(valid_loader))
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=config.momentum)
     # END YOUR CODE
 
     train_loss = []
@@ -134,14 +144,13 @@ def train_model_img_classification(model,
             # YOUR CODE HERE:
             # ii) You should zero the model gradients
             # and define the loss function for the train data.
-            raise NotImplementedError("falta completar a função train_model_img_classification")
-            # loss = 
+            optimizer.zero_grad()
+            loss = criterion(model.forward(images), labels)
             # END YOUR CODE
             if step % config.save_step == 0:
                 # YOUR CODE HERE:
                 # iii) You should define the loss function for the valid data.
-                raise NotImplementedError("falta completar a função train_model_img_classification")
-                # v_loss = 
+                v_loss = criterion(model.forward(batch_vx), batch_vy)
                 # END YOUR CODE
                 valid_loss.append(float(v_loss))
                 train_loss.append(float(loss))
@@ -154,7 +163,8 @@ def train_model_img_classification(model,
             # YOUR CODE HERE:
             # iv) You should do the back propagation
             # and do the optimization step.
-            raise NotImplementedError("falta completar a função train_model_img_classification")            
+            loss.backward()
+            optimizer.step()
             # END YOUR CODE
     if verbose:
         x = np.arange(1, len(train_loss) + 1, 1)
