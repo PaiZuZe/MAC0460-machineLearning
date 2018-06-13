@@ -133,6 +133,7 @@ def train_model_img_classification(model,
     # i) define the loss criteria and the optimizer.
     # You may find nn.CrossEntropyLoss and torch.optim.SGD useful here.
     batch_vx, batch_vy = next(iter(valid_loader))
+    batch_vx = batch_vx / 255
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=config.momentum)
     # END YOUR CODE
@@ -144,13 +145,14 @@ def train_model_img_classification(model,
             # YOUR CODE HERE:
             # ii) You should zero the model gradients
             # and define the loss function for the train data.
+            images = images / 255
             optimizer.zero_grad()
-            loss = criterion(model.forward(images), labels)
+            loss = criterion(model.soft(model.forward(images)), labels)
             # END YOUR CODE
             if step % config.save_step == 0:
                 # YOUR CODE HERE:
                 # iii) You should define the loss function for the valid data.
-                v_loss = criterion(model.forward(batch_vx), batch_vy)
+                v_loss = criterion(model.soft(model.forward(batch_vx)), batch_vy)
                 # END YOUR CODE
                 valid_loss.append(float(v_loss))
                 train_loss.append(float(loss))
