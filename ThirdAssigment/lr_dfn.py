@@ -21,7 +21,7 @@ class LogisticRegression(nn.Module):
         self.input_size = config.height * config.width * config.channels
         self.output_size = config.classes
         self.lin = nn.Linear(self.input_size, self.output_size)
-        self.soft = nn.Softmax(dim=1)
+        self.soft = nn.Softmax(dim=0)
         # END YOUR CODE
 
     def forward(self, x):
@@ -67,7 +67,7 @@ class DFN(nn.Module):
         super(DFN, self).__init__()
         # YOUR CODE HERE:
         self.relu = nn.ReLU()
-        self.soft = nn.Softmax(dim=1)
+        self.soft = nn.Softmax(dim=0)
         self.add_module("module0", nn.Linear(config.height * config.width * config.channels, config.architecture[0]))
         for i in range(len(config.architecture) - 1):
             self.add_module("module" + str(i + 1), nn.Linear(config.architecture[i], config.architecture[i + 1]))
@@ -132,8 +132,7 @@ def train_model_img_classification(model,
     # YOUR CODE HERE:
     # i) define the loss criteria and the optimizer.
     # You may find nn.CrossEntropyLoss and torch.optim.SGD useful here.
-    batch_vx, batch_vy = next(iter(valid_loader))
-    batch_vx = batch_vx / 255
+    valid = iter(valid_loader)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=config.momentum)
     # END YOUR CODE
@@ -147,12 +146,14 @@ def train_model_img_classification(model,
             # and define the loss function for the train data.
             images = images / 255
             optimizer.zero_grad()
-            loss = criterion(model.soft(model.forward(images)), labels)
+            loss = criterion((model.forward(images)), labels)
             # END YOUR CODE
             if step % config.save_step == 0:
                 # YOUR CODE HERE:
                 # iii) You should define the loss function for the valid data.
-                v_loss = criterion(model.soft(model.forward(batch_vx)), batch_vy)
+                batch_vx, batch_vy = valid.next()
+                batch_vx = batch_vx / 255
+                v_loss = criterion((model.forward(batch_vx)), batch_vy)
                 # END YOUR CODE
                 valid_loss.append(float(v_loss))
                 train_loss.append(float(loss))
