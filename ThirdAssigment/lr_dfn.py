@@ -66,10 +66,9 @@ class DFN(nn.Module):
     def __init__(self, config):
         super(DFN, self).__init__()
         # YOUR CODE HERE:
-        self.relu = nn.ReLU()
-        self.soft = nn.Softmax(dim=0)
+        self.depth = len(config.architecture)
         self.add_module("module0", nn.Linear(config.height * config.width * config.channels, config.architecture[0]))
-        for i in range(len(config.architecture) - 1):
+        for i in range(self.depth - 1):
             self.add_module("module" + str(i + 1), nn.Linear(config.architecture[i], config.architecture[i + 1]))
         # END YOUR CODE
 
@@ -86,7 +85,7 @@ class DFN(nn.Module):
         # YOUR CODE HERE:
         h = x.clone()
         for func in self.children() :
-            h = self.relu(func(h))
+            h = nn.ReLU()(func(h))
         logits = h
         # END YOUR CODE
         return logits
@@ -101,7 +100,7 @@ class DFN(nn.Module):
         :rtype: torch.LongTensor(shape=[batch_size, number_of_classes])
         """
         # YOUR CODE HERE:
-        predictions = torch.argmax(self.soft(self.forward(x)), dim=1)
+        predictions = torch.argmax(nn.Softmax(dim=0)(self.forward(x)), dim=1)
         # END YOUR CODE
         return predictions
 
