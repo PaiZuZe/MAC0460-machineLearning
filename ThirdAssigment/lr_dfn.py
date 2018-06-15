@@ -84,7 +84,7 @@ class DFN(nn.Module):
         """
         # YOUR CODE HERE:
         h = x.clone()
-        for func in self.children() :
+        for name, func in self.named_children() :
             h = nn.ReLU()(func(h))
         logits = h
         # END YOUR CODE
