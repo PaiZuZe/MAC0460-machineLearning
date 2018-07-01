@@ -71,7 +71,7 @@ def r_squared(y, y_hat):
     sstot = ssres + ssexp
     return 1 - (ssexp / sstot)
 
-
+    
 def randomize_in_place(list1, list2, init=0):
     """
     Function to randomize two lists in the same way.
